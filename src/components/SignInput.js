@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components/native";
 
 const InputArea = styled.View`
-    width: ${props=>props.width};
+    ${props => props.width && `width:${props=>props.width}px`};
     height: 60px;
     background-color: #83D6E3;
     flex-direction: row;
