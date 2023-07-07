@@ -14,7 +14,7 @@ import SignInput from "../../components/SignInput";
 
 import axios from 'axios';
 
-import { auth } from '../../../firebaseConfig';
+import { auth } from '../../services/firebaseConfig';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 

@@ -18,7 +18,7 @@ import PetrainerLoginLogo from '../../assets/Petrainer-Login.svg';
 
 import { initializeApp } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../../firebaseConfig';
+import { auth } from '../../services/firebaseConfig';
 import { Alert } from "react-native";
 
 export default () => {
