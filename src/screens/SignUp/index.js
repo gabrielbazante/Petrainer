@@ -14,8 +14,9 @@ import SignInput from "../../components/SignInput";
 
 import axios from 'axios';
 
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { auth } from '../../../firebaseConfig';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 import EmailIcon from '../../assets/Email.svg';
 import LockIcon from '../../assets/Lock.svg';
@@ -30,7 +31,6 @@ import { Alert } from "react-native";
 export default () => {
     const navigation = useNavigation();
 
-    const auth = getAuth();
     const db = getFirestore();
 
     const [emailField, setEmailField] = useState('');
@@ -71,18 +71,12 @@ export default () => {
       
 
     const handleSignClick = () => {
-        auth.createUserWithEmailAndPassword(emailField, 
-                                            passwordField, 
-                                            nomeField, 
-                                            ruaField, 
-                                            bairroField, 
-                                            cepField, 
-                                            cidadeField, 
-                                            estadoField, 
-                                            generoField)
-        .then(() => {
-            let uid = auth.currentUser.uid;
-            db.collection('users').doc(uid).set({
+        createUserWithEmailAndPassword(auth, emailField, passwordField)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            const uid = user.uid;
+
+            const userData = {
                 nome: nomeField,
                 email: emailField,
                 rua: ruaField,
@@ -90,21 +84,30 @@ export default () => {
                 cep: cepField,
                 cidade: cidadeField,
                 estado: estadoField,
-                genero: generoField
-            })
-            .then(() => {
-                // navigation.reset({
-                //     routes: [{name: 'MainTab'}]
-                // });
-                Alert.alert("Cadastro realizado com sucesso!");
-            })
-            .catch((error) => {
-                alert(error);
-            });
-        }
-        )
+                genero: generoField,
+                senha: passwordField,
+            };
 
-    }
+            const userRef = doc(db, "users", uid);
+            setDoc(userRef, userData)
+                .then(() => {
+                    Alert.alert("Cadastro realizado com sucesso!");
+                    navigation.reset({
+                        routes: [{name: 'SignIn'}]
+                    });
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    Alert.alert("Erro code: " + errorCode + " - " + errorMessage + "!");
+                });
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            Alert.alert("Erro code: " + errorCode + " - " + errorMessage + "!");
+        });
+    };
 
     const handleMessageButtonClick = () => {
         navigation.reset({
