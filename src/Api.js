@@ -20,7 +20,6 @@ export default {
     signIn: async (email, password) => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            Alert.alert("Sucesso!", "Login efetuado com sucesso!");
         }
         catch(error){
             Alert.alert("Erro!", "Usuário ou senha inválidos!");
