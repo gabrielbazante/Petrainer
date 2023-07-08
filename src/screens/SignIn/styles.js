@@ -10,7 +10,7 @@ export const Container = styled.SafeAreaView`
 
 export const ContainerLogo = styled.View`
     flex: 1;
-    width: 450px;
+    width: 100%;
     height: 370px;
     top: 0;
     position: absolute;

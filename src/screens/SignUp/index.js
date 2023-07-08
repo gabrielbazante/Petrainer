@@ -14,8 +14,6 @@ import SignInput from "../../components/SignInput";
 
 import axios from 'axios';
 
-import { Alert } from "react-native";
-
 import { default as Api } from '../../Api';
 
 import EmailIcon from '../../assets/Email.svg';
@@ -53,20 +51,6 @@ export default () => {
         setEstadoField(response.data.uf);
     }
 
-    useEffect(() => {
-        if(cepField.length === 8) {
-            buscarCep();
-        }
-    }, [cepField]);
-
-    useEffect(() => {
-        if (generoField === "Masculino" || generoField === "") {
-          setPetrainerIcon(<PetrainerMan width="100%" height="300" style={{ top: 25 }} />);
-        } else if (generoField === "Feminino"){
-          setPetrainerIcon(<PetrainerWoman width="100%" height="260" style={{ top: 35, margin: 20 }} />);
-        }
-      }, [generoField]);
-      
 
     const handleSignClick = async () => {
         if(emailField != '' || 
@@ -98,6 +82,20 @@ export default () => {
             routes: [{name: 'SignIn'}]
         });
     }
+
+    useEffect(() => {
+        if(cepField.length === 8) {
+            buscarCep();
+        }
+    }, [cepField]);
+
+    useEffect(() => {
+        if (generoField === "Masculino" || generoField === "") {
+          setPetrainerIcon(<PetrainerMan width="100%" height="300" style={{ top: 25 }} />);
+        } else if (generoField === "Feminino"){
+          setPetrainerIcon(<PetrainerWoman width="100%" height="260" style={{ top: 35, margin: 20 }} />);
+        }
+      }, [generoField]);
 
     return (
         <Container>

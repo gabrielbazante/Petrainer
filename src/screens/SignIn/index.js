@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigation } from '@react-navigation/native';
+
 import { Container,
          ContainerLogo, 
          InputArea,
@@ -19,6 +20,7 @@ import LockIcon from '../../assets/Lock.svg';
 import PetrainerLoginLogo from '../../assets/Petrainer-Login.svg';
 
 export default () => {
+    // const { dispatch: userDispatch } = useContext(UserContext);
     const navigation = useNavigation();
     
     const [emailField, setEmailField] = useState('');
@@ -28,6 +30,9 @@ export default () => {
     const handleSignClick = async () => {
         if(emailField != '' && passwordField != '') {
             await Api.signIn(emailField, passwordField);
+            navigation.reset({
+                routes: [{name: 'MainTab'}]
+            });
         } else {
             alert("Preencha os campos corretamente!");
         }
