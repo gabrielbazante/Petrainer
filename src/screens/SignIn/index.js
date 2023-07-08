@@ -12,14 +12,11 @@ import { Container,
 
 import SignInput from "../../components/SignInput";
 
+import { default as Api } from '../../Api';
+
 import EmailIcon from '../../assets/Email.svg';
 import LockIcon from '../../assets/Lock.svg';
 import PetrainerLoginLogo from '../../assets/Petrainer-Login.svg';
-
-import { initializeApp } from "firebase/app";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../services/firebaseConfig';
-import { Alert } from "react-native";
 
 export default () => {
     const navigation = useNavigation();
@@ -28,18 +25,12 @@ export default () => {
     const [passwordField, setPasswordField] = useState('');
 
 
-    const handleSignClick = () => {
-        signInWithEmailAndPassword(auth, emailField, passwordField)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            // navigation.reset({
-            //     routes: [{name: 'MainTab'}]
-            // });
-            Alert.alert("Sucesso!", "Login efetuado com sucesso!");
-        })
-        .catch((error) => {
-            Alert.alert("Erro!", "Usuário ou senha inválidos!");
-        });
+    const handleSignClick = async () => {
+        if(emailField != '' && passwordField != '') {
+            await Api.signIn(emailField, passwordField);
+        } else {
+            alert("Preencha os campos corretamente!");
+        }
     }
 
     const handleMessageButtonClick = () => {

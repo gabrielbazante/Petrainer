@@ -14,9 +14,9 @@ import SignInput from "../../components/SignInput";
 
 import axios from 'axios';
 
-import { auth } from '../../services/firebaseConfig';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { Alert } from "react-native";
+
+import { default as Api } from '../../Api';
 
 import EmailIcon from '../../assets/Email.svg';
 import LockIcon from '../../assets/Lock.svg';
@@ -26,12 +26,10 @@ import GenderIcon from '../../assets/gender.svg';
 import MyLocationIcon from '../../assets/my_location.svg';
 import PetrainerMan from '../../assets/Petrainer-Man.svg';
 import PetrainerWoman from '../../assets/Petrainer-Woman.svg'
-import { Alert } from "react-native";
+
 
 export default () => {
     const navigation = useNavigation();
-
-    const db = getFirestore();
 
     const [emailField, setEmailField] = useState('');
     const [passwordField, setPasswordField] = useState('');
@@ -70,43 +68,29 @@ export default () => {
       }, [generoField]);
       
 
-    const handleSignClick = () => {
-        createUserWithEmailAndPassword(auth, emailField, passwordField)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            const uid = user.uid;
+    const handleSignClick = async () => {
+        if(emailField != '' || 
+           nomeField != '' ||
+           ruaField != '' ||
+           bairroField != '' ||
+           cepField != '' ||
+           cidadeField != '' ||
+           estadoField != '' ||
+           generoField != '' ||
+           passwordField != '') {
 
-            const userData = {
-                nome: nomeField,
-                email: emailField,
-                rua: ruaField,
-                bairro: bairroField,
-                cep: cepField,
-                cidade: cidadeField,
-                estado: estadoField,
-                genero: generoField,
-                senha: passwordField,
-            };
-
-            const userRef = doc(db, "users", uid);
-            setDoc(userRef, userData)
-                .then(() => {
-                    Alert.alert("Cadastro realizado com sucesso!");
-                    navigation.reset({
-                        routes: [{name: 'SignIn'}]
-                    });
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    Alert.alert("Erro code: " + errorCode + " - " + errorMessage + "!");
-                });
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            Alert.alert("Erro code: " + errorCode + " - " + errorMessage + "!");
-        });
+            await Api.signUp(emailField, 
+                            nomeField, 
+                            ruaField, 
+                            bairroField, 
+                            cepField, 
+                            cidadeField, 
+                            estadoField, 
+                            generoField, 
+                            passwordField);
+        } else {
+            alert("Preencha os campos!");
+        }
     };
 
     const handleMessageButtonClick = () => {
