@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, verifyIdToken } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, getDocs, getDoc, setDoc, collection } from "firebase/firestore";
 import { auth } from '../src/services/firebaseConfig';
 import { Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
@@ -67,5 +67,29 @@ export default {
             const errorMessage = error.message;
             Alert.alert("Erro code: " + errorCode + " - " + errorMessage + "!");
         };
-    }
+    },
+
+    getTrainers: async () => {
+        const db = getFirestore();
+        const trainersRef = collection(db, "trainers");
+      
+        try {
+          const trainersSnapshot = await getDocs(trainersRef);
+          const trainersData = trainersSnapshot.docs.map((doc) => doc.data());
+      
+          const errorSnapshot = await getDoc(doc(db, "trainers/error"));
+          const locSnapshot = await getDoc(doc(db, "trainers/loc"));
+      
+          const trainers = {
+            data: trainersData,
+            error: { error: errorSnapshot.data().error },
+            loc: { loc: locSnapshot.data().loc }
+          };
+      
+          return trainers;
+        } catch (error) {
+          alert("Erro: " + error);
+          return null;
+        }
+      }
 };
