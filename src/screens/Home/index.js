@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { default as Api } from "../../Api";
+import { RefreshControl } from "react-native";
 import * as Location from "expo-location";
 import { Container,
          Scroller,
@@ -22,6 +23,7 @@ import MyLocationIcon from "../../assets/my_location.svg";
 export default () => {
     const navigation = useNavigation();
 
+    const [refreshing, setRefreshing] = useState(false);
     const [locationText, setLocationText] = useState('');
     const [loading, setLoading] = useState(false);
     const [coords, setCoords] = useState(null);
@@ -56,25 +58,12 @@ export default () => {
         }
       
         try {
-          const res = await Api.getTrainers();
+          const res = await Api.getTrainers(lat, lng, locationText);
           if (res && res.data && Array.isArray(res.data)) {
-            const trainers = {
-              data: res.data.map((trainer) => ({
-                avatar: trainer.avatar,
-                id: trainer.id,
-                name: trainer.name,
-                stars: trainer.stars
-              })),
-              error: { error: res.error.error },
-              loc: { loc: res.loc.loc }
-            };
-      
             if (res.loc && res.loc.loc) {
               setLocationText(res.loc.loc);
             }
-
             const listaAtual = JSON.parse(JSON.stringify(res.data[0]));
-      
             setList(Object.values(listaAtual));
           } else {
             alert("Erro: Nenhum treinador encontrado.");
@@ -91,9 +80,19 @@ export default () => {
         getTrainers();
     }, []);
 
+    const onRefresh = () => {
+        setRefreshing(false);
+        getTrainers();
+    }
+    const handleLocationSearch = () => {
+        setCoords({});
+        getTrainers();
+    }
     return (
         <Container>
-            <Scroller>
+            <Scroller refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} /> 
+            }>
                 <HeaderArea>
                     <HeaderTitle numberOfLines={2}>Encontre o seu adestrador favorito</HeaderTitle>
                     <SearchButton onPress={() => navigation.navigate('Search')}>
@@ -107,6 +106,7 @@ export default () => {
                         placeholderTextColor="#FFFFFF"
                         value={locationText}
                         onChangeText={t=>setLocationText(t)}
+                        onEndEditing={handleLocationSearch}
                     />
                     <LocationFinder onPress={handleLocationFinder}>
                         <MyLocationIcon width="24" height="24" fill="#FFFFFF" />

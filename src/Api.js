@@ -69,7 +69,7 @@ export default {
         };
     },
 
-    getTrainers: async () => {
+    getTrainers: async (lat= null, lng=null, address=null) => {
         const db = getFirestore();
         const trainersRef = collection(db, "trainers");
       
