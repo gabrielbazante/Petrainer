@@ -14,8 +14,7 @@ import SignInput from "../../components/SignInput";
 
 import axios from 'axios';
 
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { default as Api } from '../../Api';
 
 import EmailIcon from '../../assets/Email.svg';
 import LockIcon from '../../assets/Lock.svg';
@@ -25,13 +24,10 @@ import GenderIcon from '../../assets/gender.svg';
 import MyLocationIcon from '../../assets/my_location.svg';
 import PetrainerMan from '../../assets/Petrainer-Man.svg';
 import PetrainerWoman from '../../assets/Petrainer-Woman.svg'
-import { Alert } from "react-native";
+
 
 export default () => {
     const navigation = useNavigation();
-
-    const auth = getAuth();
-    const db = getFirestore();
 
     const [emailField, setEmailField] = useState('');
     const [passwordField, setPasswordField] = useState('');
@@ -55,6 +51,38 @@ export default () => {
         setEstadoField(response.data.uf);
     }
 
+
+    const handleSignClick = async () => {
+        if(emailField != '' || 
+           nomeField != '' ||
+           ruaField != '' ||
+           bairroField != '' ||
+           cepField != '' ||
+           cidadeField != '' ||
+           estadoField != '' ||
+           generoField != '' ||
+           passwordField != '') {
+
+            await Api.signUp(emailField, 
+                            nomeField, 
+                            ruaField, 
+                            bairroField, 
+                            cepField, 
+                            cidadeField, 
+                            estadoField, 
+                            generoField, 
+                            passwordField);
+        } else {
+            alert("Preencha os campos!");
+        }
+    };
+
+    const handleMessageButtonClick = () => {
+        navigation.reset({
+            routes: [{name: 'SignIn'}]
+        });
+    }
+
     useEffect(() => {
         if(cepField.length === 8) {
             buscarCep();
@@ -68,49 +96,6 @@ export default () => {
           setPetrainerIcon(<PetrainerWoman width="100%" height="260" style={{ top: 35, margin: 20 }} />);
         }
       }, [generoField]);
-      
-
-    const handleSignClick = () => {
-        auth.createUserWithEmailAndPassword(emailField, 
-                                            passwordField, 
-                                            nomeField, 
-                                            ruaField, 
-                                            bairroField, 
-                                            cepField, 
-                                            cidadeField, 
-                                            estadoField, 
-                                            generoField)
-        .then(() => {
-            let uid = auth.currentUser.uid;
-            db.collection('users').doc(uid).set({
-                nome: nomeField,
-                email: emailField,
-                rua: ruaField,
-                bairro: bairroField,
-                cep: cepField,
-                cidade: cidadeField,
-                estado: estadoField,
-                genero: generoField
-            })
-            .then(() => {
-                // navigation.reset({
-                //     routes: [{name: 'MainTab'}]
-                // });
-                Alert.alert("Cadastro realizado com sucesso!");
-            })
-            .catch((error) => {
-                alert(error);
-            });
-        }
-        )
-
-    }
-
-    const handleMessageButtonClick = () => {
-        navigation.reset({
-            routes: [{name: 'SignIn'}]
-        });
-    }
 
     return (
         <Container>

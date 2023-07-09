@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import { Container, LoadingIcon, Title } from './styles'
 import { useNavigation } from "@react-navigation/native";
-// import AsyncStorage from "@react-native-community/async-storage";
+import { auth } from "../../services/firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
+import { default as Api } from '../../Api';
 
 import PetrainerLogo from "../../assets/Petrainer.svg";
 
@@ -9,7 +11,7 @@ export default () => {
     const navigation = useNavigation();
     
     useEffect(() => {
-        // const checkToken = async () => {
+      // const checkToken = async () => {
             // const token = await AsyncStorage.getItem('token');
             // if(token !== null) {
             //     // Validar token
