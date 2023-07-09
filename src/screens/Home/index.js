@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Alert } from "react-native";
 import { default as Api } from "../../Api";
 import * as Location from "expo-location";
-import { Platform } from "react-native";
 import { Container,
          Scroller,
          HeaderArea,
