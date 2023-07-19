@@ -1,13 +1,13 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, verifyIdToken } from "firebase/auth";
-import { getFirestore, doc, getDocs, getDoc, setDoc, collection } from "firebase/firestore";
-import { auth } from '../src/services/firebaseConfig';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, verifyIdToken, signOut } from "firebase/auth";
+import { doc, getDocs, getDoc, setDoc, collection, updateDoc } from "firebase/firestore";
+import { auth, database } from '../src/services/firebaseConfig';
 import { Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 
 
 export default {
     checkToken: async (token) => {
-        const auth = getAuth();
+        // const auth = getAuth();
         try {
             const decodedToken = await verifyIdToken(auth, token);
             const userId = decodedToken.uid;
@@ -26,8 +26,12 @@ export default {
         };
     },
 
+    logout: async () => {
+        await signOut(auth);
+    },
+
     signUp: async (email, nome, rua, bairro, cep, cidade, estado, genero, password) => {
-        const db = getFirestore();
+        // const database = getFirestore();
         const navigation = useNavigation();
         try {
             await createUserWithEmailAndPassword(auth, email, password)
@@ -47,7 +51,7 @@ export default {
                     senha: password,
                 };
 
-                const userRef = doc(db, "users", uid);
+                const userRef = doc(database, "users", uid);
                 setDoc(userRef, userData)
                     .then(() => {
                         Alert.alert("Cadastro realizado com sucesso!");
@@ -69,27 +73,72 @@ export default {
         };
     },
 
-    getTrainers: async () => {
-        const db = getFirestore();
-        const trainersRef = collection(db, "trainers");
+    getTrainers: async (lat= null, lng=null, address=null) => {
+        // const database = getFirestore();
+        const trainersRef = collection(database, "trainers");
       
         try {
           const trainersSnapshot = await getDocs(trainersRef);
           const trainersData = trainersSnapshot.docs.map((doc) => doc.data());
-      
-          const errorSnapshot = await getDoc(doc(db, "trainers/error"));
-          const locSnapshot = await getDoc(doc(db, "trainers/loc"));
-      
+            
+          const errorSnapshot = await getDoc(doc(database, "trainers/error"));
+          const locSnapshot = await getDoc(doc(database, "trainers/loc"));
+
           const trainers = {
             data: trainersData,
             error: { error: errorSnapshot.data().error },
             loc: { loc: locSnapshot.data().loc }
           };
-      
           return trainers;
         } catch (error) {
           alert("Erro: " + error);
           return null;
         }
-      }
+      },
+      
+
+    getTrainer: async (id) => {
+        const trainersRef = collection(database, "trainers");
+        const trainersSnapshot = await getDocs(trainersRef);
+        const trainersData = trainersSnapshot.docs.map((doc) => doc.data());
+        
+        const errorSnapshot = await getDoc(doc(database, "trainers/error"));
+        const locSnapshot = await getDoc(doc(database, "trainers/loc"));
+
+        const trainers = {
+            data: trainersData,
+            error: { error: errorSnapshot.data().error },
+            loc: { loc: locSnapshot.data().loc }
+        };
+        const trainer = trainers.data[0][id];
+        return trainer;
+    },
+
+    setFavorite: async (id, isFavorite) => {
+        const trainersRef = collection(database, "trainers");
+        const trainersSnapshot = await getDocs(trainersRef);
+        const trainersData = trainersSnapshot.docs.map((doc) => doc.data());
+        
+        const errorSnapshot = await getDoc(doc(database, "trainers/error"));
+        const locSnapshot = await getDoc(doc(database, "trainers/loc"));
+
+        const trainers = {
+            data: trainersData,
+            error: { error: errorSnapshot.data().error },
+            loc: { loc: locSnapshot.data().loc }
+        };
+        const trainer = trainers.data[0][id];
+        trainer.favorited = !isFavorite;
+        const trainerDocRef = doc(database, "trainers", "data");
+        try{
+            await updateDoc(trainerDocRef, {
+                [`${id}.favorited`]: trainer.favorited,
+            });
+            alert("Favorito atualizado com sucesso!");
+            return trainer.favorited;
+        } catch (error) {
+            alert("Erro ao atualizar favorito: " + error);
+            return null;
+        }
+    }
 };
