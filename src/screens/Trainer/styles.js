@@ -117,3 +117,21 @@ export const BackButton = styled.TouchableOpacity`
 export const LoadingIcon = styled.ActivityIndicator`
     margin-top: 50px;
 `;
+
+export const HandleSubmitDateAndTime = styled.TouchableOpacity`
+    background-color: #2D90A9;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-top: 20px;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom: 50px;
+`;
+export const HandleSubmitDateAndTimeText = styled.Text`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 400;
+    color: #FFFFFF;
+`;
